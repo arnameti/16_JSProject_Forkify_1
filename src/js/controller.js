@@ -1,6 +1,7 @@
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 import icons from "url:../img/icons.svg";
+import * as model from "./model";
 
 // https://forkify-api.herokuapp.com/v2
 
@@ -13,36 +14,19 @@ const controlRecipe = async function () {
   try {
     const id = window.location.hash.slice(1);
 
-    const res = await fetch(
-      `https://forkify-api.herokuapp.com/api/v2/recipes/${id}`
-    );
+    if (!id) return;
 
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(`${res.status}: ${data.status}`);
-
-    let { recipe } = data.data;
-
-    recipe = {
-      cookingTime: recipe.cooking_time,
-      id: recipe.id,
-      image: recipe.image_url,
-      ingredients: recipe.ingredients,
-      publisher: recipe.publisher,
-      servings: recipe.servings,
-      sourceUrl: recipe.sourceUrl,
-      title: recipe.title,
-    };
-
-    console.log(recipe);
+    await model.fetchRecipe(id);
 
     // 2: Rendering the Recipe
 
     const markup = `
       <figure class="recipe__fig">
-        <img src="${recipe.image}" alt="${recipe.title}" class="recipe__img" />
+        <img src="${model.state.recipe.image}" alt="${
+      model.state.recipe.title
+    }" class="recipe__img" />
         <h1 class="recipe__title">
-          <span>${recipe.title}</span>
+          <span>${model.state.recipe.title}</span>
         </h1>
       </figure>
 
@@ -52,7 +36,7 @@ const controlRecipe = async function () {
             <use href="src/img/icons.svg#icon-clock"></use>
           </svg>
           <span class="recipe__info-data recipe__info-data--minutes">${
-            recipe.cookingTime
+            model.state.recipe.cookingTime
           }</span>
           <span class="recipe__info-text">minutes</span>
         </div>
@@ -61,7 +45,7 @@ const controlRecipe = async function () {
             <use href="src/img/icons.svg#icon-users"></use>
           </svg>
           <span class="recipe__info-data recipe__info-data--people">${
-            recipe.servings
+            model.state.recipe.servings
           }</span>
           <span class="recipe__info-text">servings</span>
 
@@ -94,7 +78,7 @@ const controlRecipe = async function () {
       <div class="recipe__ingredients">
         <h2 class="heading--2">Recipe ingredients</h2>
         <ul class="recipe__ingredient-list">
-          ${recipe.ingredients
+          ${model.state.recipe.ingredients
             .map((ing) => {
               return `
             <li class="recipe__ingredient">
@@ -129,13 +113,13 @@ const controlRecipe = async function () {
         <p class="recipe__directions-text">
           This recipe was carefully designed and tested by
           <span class="recipe__publisher">${
-            recipe.publisher
+            model.state.recipe.publisher
           }</span>. Please check out
           directions at their website.
         </p>
         <a
           class="btn--small recipe__btn"
-          href="${recipe.sourceUrl}"
+          href="${model.state.recipe.sourceUrl}"
           target="_blank"
         >
           <span>Directions</span>
