@@ -8,8 +8,6 @@ import recipeView from "./views/recipeView.js";
 
 ///////////////////////////////////////
 
-const recipeContainer = document.querySelector(".recipe");
-
 const controlRecipe = async function () {
   // 1: Loading Recipe
   try {
@@ -28,6 +26,8 @@ const controlRecipe = async function () {
   }
 };
 
-["hashchange", "load"].forEach((ev) => {
-  window.addEventListener(ev, controlRecipe);
-});
+const init = function () {
+  recipeView.addHandlerRender(controlRecipe);
+};
+
+init();
